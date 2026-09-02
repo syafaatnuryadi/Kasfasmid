@@ -6,97 +6,332 @@
   <title>Aplikasi Laporan Keuangan</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <style>
-  :root{
-    --primary:#0b66ff;
-    --primary-dark:#07122b;
-    --primary-soft:#eaf3ff;
-    --text:#0f172a;
-    --text-soft:#64748b;
-    --bg:#f4f8ff;
-    --white:#ffffff;
-    --line:#e5edf9;
-    --success:#22c55e;
-    --danger:#ef4444;
-    --shadow:0 18px 42px rgba(15,23,42,0.08);
-  }
-  *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:radial-gradient(circle at top left,#eaf3ff 0%, var(--bg) 28%, #ffffff 100%);color:var(--text)}
+    :root {
+      --primary: #0b66ff;
+      --primary-dark: #07122b;
+      --primary-soft: #eaf3ff;
+      --text: #0f172a;
+      --text-soft: #64748b;
+      --bg: #f4f8ff;
+      --white: #ffffff;
+      --line: #e5edf9;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+    }
 
-  /* Navbar / Hero */
-  .nav{display:flex;justify-content:space-between;align-items:center;padding:22px 32px;max-width:1200px;margin:0 auto;gap:16px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#ffffff,#eaf3ff);display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:800;box-shadow:0 10px 24px rgba(11,102,255,0.12)}
-  .brand-name{font-weight:800;font-size:1.05rem}
-  .brand-sub{font-size:12px;color:var(--text-soft)}
-  .nav a{color:var(--text);text-decoration:none;margin-left:14px;font-weight:600;opacity:.8}
-  .nav a:hover{opacity:1}
-  .nav .links{display:flex;align-items:center;gap:12px}
+    * { box-sizing: border-box; font-family: Inter, Segoe UI, Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 35%, #ffffff 100%);
+      color: var(--text);
+    }
 
-  .hero{max-width:1200px;margin:12px auto;padding:28px 28px 20px;border-radius:24px;background:linear-gradient(135deg,#091a32 0%,#0f2a52 28%,#0c6dff 100%);display:flex;gap:24px;align-items:stretch;box-shadow:var(--shadow)}
-  .hero-left{flex:1;padding:10px 0}
-  .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.12);color:#dfeeff;border:1px solid rgba(255,255,255,0.15);font-size:12px;font-weight:700;letter-spacing:.02em;margin-bottom:18px}
-  .hero-badge::before{content:"";display:block;width:8px;height:8px;border-radius:50%;background:#72f1b6;box-shadow:0 0 14px rgba(114,241,182,0.9)}
-  .hero h1{margin:0;font-size:clamp(2rem,4vw,3rem);color:#ffffff;line-height:1.08;letter-spacing:-.04em;max-width:620px}
-  .hero p{color:rgba(255,255,255,0.8);margin-top:12px;max-width:560px;line-height:1.7}
-  .hero .cta{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap}
-  .btn{appearance:none;border:none;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer;transition:.2s ease}
-  .btn:hover{transform:translateY(-1px)}
-  .btn-primary{background:var(--white);color:var(--primary-dark);box-shadow:0 10px 24px rgba(11,17,32,0.15)}
-  .btn-secondary{background:rgba(255,255,255,0.08);color:var(--white);border:1px solid rgba(255,255,255,0.2)}
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-  .hero-right{width:340px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:18px 18px 14px;backdrop-filter:blur(4px)}
-  .hero-right h4{margin:0 0 10px 0;color:#f8fbff;font-size:0.95rem}
-  .hero-right .summary{margin:0;font-size:1.1rem;font-weight:700;color:#fff}
-  .hero-right .summary-note{margin-top:8px;color:rgba(255,255,255,0.7);font-size:12px}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-  /* Dashboard grid */
-  .container{max-width:1200px;margin:26px auto;padding:0 16px 32px}
-  .grid{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
-  .cards{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:14px}
-  .card{background:var(--white);padding:18px 18px 16px;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 24px rgba(15,23,42,0.04);position:relative;overflow:hidden}
-  .card::after{content:"";position:absolute;inset:auto -30px -30px auto;width:110px;height:110px;border-radius:50%;background:rgba(11,102,255,0.04)}
-  .card-header{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
-  .card-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem}
-  .card-icon.blue{background:rgba(11,102,255,0.1);color:var(--primary)}
-  .card-icon.dark{background:rgba(7,18,43,0.08);color:var(--primary-dark)}
-  .card-icon.green{background:rgba(34,197,94,0.1);color:var(--success)}
-  .trend{padding:6px 8px;border-radius:999px;font-size:11px;font-weight:700;position:relative;z-index:1}
-  .trend.positive{background:rgba(34,197,94,0.12);color:#15803d}
-  .trend.negative{background:rgba(239,68,68,0.10);color:#b91c1c}
-  .card h3{margin:18px 0 8px 0;font-size:13px;color:var(--text-soft);font-weight:700;letter-spacing:.02em;position:relative;z-index:1}
-  .card p{font-size:1.8rem;margin:0;font-weight:800;letter-spacing:-.04em;color:var(--text);position:relative;z-index:1}
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ffffff, #eaf3ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(11, 102, 255, 0.12);
+    }
 
-  .panel-table{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:0;overflow:hidden;box-shadow:0 10px 24px rgba(15,23,42,0.04)}
-  .panel-table h2{margin:0;padding:18px 18px 10px;font-size:1.2rem}
-  table{width:100%;border-collapse:collapse;background:var(--white)}
-  thead th{background:linear-gradient(180deg,#0a1630,#0d1d3d);color:#edf5ff;text-align:left;padding:12px 14px;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
-  tbody td{padding:12px 14px;border-top:1px solid var(--line);color:var(--text)}
-  tbody tr{transition:.2s ease}
-  tbody tr:hover{background:#f8fbff}
-  .money{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+    .brand-name {
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
 
-  .right-panel{display:flex;flex-direction:column;gap:14px}
-  .mini-card{background:var(--white);padding:18px;border-radius:18px;border:1px solid var(--line);box-shadow:0 10px 24px rgba(15,23,42,0.04)}
-  .mini-card h4{margin:0 0 12px;font-size:0.95rem;color:var(--text)}
-  .mini-card .product{font-weight:800;margin:0;color:var(--text);font-size:1rem}
-  .mini-card .meta{margin-top:5px;color:var(--text-soft);font-size:13px}
-  .mini-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-  .mini-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
-  .mini-item:last-child{border-bottom:none}
-  .mini-item strong{font-size:13px;color:var(--text-soft)}
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
 
-  .chart{margin-top:0;background:transparent;padding:0;border-radius:8px}
-  .footer{padding:22px 14px 40px;text-align:center;color:var(--text-soft);font-size:13px}
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
 
-  @media (max-width:980px){
-    .nav{padding:18px 16px}
-    .links{display:none}
-    .hero{padding:22px 18px;border-radius:18px;flex-direction:column}
-    .hero-right{width:100%}
-    .grid{grid-template-columns:1fr}
-    .cards{grid-template-columns:1fr}
-  }
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      opacity: 0.8;
+    }
+
+    .nav-links a:hover { opacity: 1; }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto 40px;
+      padding: 0 16px;
+    }
+
+    .page-header {
+      background: linear-gradient(135deg, #091a32 0%, #0f2a52 30%, #0c6dff 100%);
+      border-radius: 24px;
+      color: white;
+      padding: 26px 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: clamp(2rem, 3vw, 2.6rem);
+      letter-spacing: -0.04em;
+    }
+
+    .page-header p {
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.7;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+      padding: 22px;
+    }
+
+    .panel h2,
+    .mini-panel h3 {
+      margin: 0 0 18px;
+      font-size: 1.2rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -30px -30px auto;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(11, 102, 255, 0.04);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .stat-icon.blue { background: rgba(11, 102, 255, 0.1); color: var(--primary); }
+    .stat-icon.dark { background: rgba(7, 18, 43, 0.08); color: var(--primary-dark); }
+    .stat-icon.green { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+
+    .trend {
+      padding: 6px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+
+    .trend.positive {
+      background: rgba(34, 197, 94, 0.12);
+      color: #15803d;
+    }
+
+    .trend.negative {
+      background: rgba(239, 68, 68, 0.10);
+      color: #b91c1c;
+    }
+
+    .stat-card h3 {
+      margin: 18px 0 8px;
+      font-size: 13px;
+      color: var(--text-soft);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-card p {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      position: relative;
+      z-index: 1;
+    }
+
+    .table-wrap {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--white);
+    }
+
+    thead th {
+      background: linear-gradient(180deg, #0a1630, #0d1d3d);
+      color: #edf5ff;
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    tbody tr { transition: 0.2s ease; }
+    tbody tr:hover { background: #f8fbff; }
+
+    .money {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    .side-panel {
+      display: grid;
+      gap: 14px;
+    }
+
+    .mini-panel {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .mini-panel .label {
+      margin: 0 0 12px;
+      color: var(--text-soft);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .mini-panel .value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .mini-panel .meta {
+      margin-top: 6px;
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .list-item:last-child { border-bottom: none; }
+    .list-item strong {
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 180px;
+      margin-top: 8px;
+    }
+
+    .footer {
+      padding: 22px 14px 40px;
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .nav { padding: 18px 16px; }
+      .nav-links { display: none; }
+      .grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .page-header { border-radius: 18px; }
+    }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -192,49 +427,43 @@
         <div class="brand-sub">Visitor dashboard</div>
       </div>
     </div>
-    <div class="links">
+    <div class="nav-links">
       <a href="./">Pengunjung</a>
     </div>
   </div>
 
-  <section class="hero">
-    <div class="hero-left">
-      <div class="hero-badge">Ringkasan • Keuangan • Umum</div>
-      <h1>Ringkasan Bisnis Anda — Laporan Keuangan</h1>
-      <p>Pantau aset, liabilitas, dan performa keuangan secara ringkas dalam satu tampilan yang sederhana dan mudah dibaca.</p>
-      <div class="cta" style="display:none;"></div>
-    </div>
-    <div class="hero-right">
-      <h4>Ringkasan data</h4>
-      <p class="summary">Tampilan status laporan keuangan</p>
-      <div class="summary-note">Data dapat diperbarui sesuai kebutuhan aplikasi</div>
-      <div style="height:120px;margin-top:12px"><canvas id="chart-compo" width="320" height="120"></canvas></div>
-    </div>
-  </section>
-
   <main class="container">
+    <header class="page-header">
+      <h1>Ringkasan Bisnis Anda</h1>
+      <p>Pantau aset, liabilitas, dan performa keuangan secara ringkas dalam satu tampilan yang konsisten dengan dashboard admin.</p>
+    </header>
+
     <div class="grid">
-      <div>
-        <div class="cards">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon blue">A</div>
+      <section class="panel">
+        <h2>Dashboard Publik</h2>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon blue">A</div>
               <span class="trend positive">+8.4%</span>
             </div>
             <h3>Total Aset</h3>
             <p id="total-assets">0</p>
           </div>
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon dark">L</div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon dark">L</div>
               <span class="trend negative">-1.2%</span>
             </div>
             <h3>Total Liabilitas</h3>
             <p id="total-liabilities">0</p>
           </div>
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon green">P</div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon green">P</div>
               <span class="trend positive">+15.6%</span>
             </div>
             <h3>Laba / Rugi</h3>
@@ -242,36 +471,43 @@
           </div>
         </div>
 
-        <div class="panel-table" style="margin-top:18px">
-          <h2>Jurnal Terbaru</h2>
+        <div class="table-wrap">
           <table id="journal-table">
             <thead>
-              <tr><th>Tanggal</th><th>Deskripsi</th><th>Debit</th><th>Kredit</th></tr>
+              <tr>
+                <th>Tanggal</th>
+                <th>Deskripsi</th>
+                <th>Debit</th>
+                <th>Kredit</th>
+              </tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
-      </div>
+      </section>
 
-      <aside class="right-panel">
-        <div class="mini-card">
-          <h4>Data Terbaru</h4>
-          <div class="product">Informasi keuangan tersedia dalam tampilan publik</div>
-          <div class="meta">Siap ditampilkan untuk pengunjung</div>
+      <aside class="side-panel">
+        <div class="mini-panel">
+          <div class="label">Ringkasan data</div>
+          <p class="value">Tampilan status laporan keuangan</p>
+          <div class="meta">Data dapat diperbarui sesuai kebutuhan aplikasi.</div>
+          <div class="chart-wrap">
+            <canvas id="chart-compo" width="320" height="180"></canvas>
+          </div>
         </div>
 
-        <div class="mini-card">
-          <h4>Status Sistem</h4>
-          <div class="mini-list">
-            <div class="mini-item"><strong>Mode</strong><span>Publik</span></div>
-            <div class="mini-item"><strong>Status</strong><span>Siap</span></div>
-            <div class="mini-item"><strong>Update</strong><span>Manual</span></div>
+        <div class="mini-panel">
+          <h3>Informasi</h3>
+          <div class="list">
+            <div class="list-item"><strong>Mode</strong><span>Publik</span></div>
+            <div class="list-item"><strong>Status</strong><span>Siap</span></div>
+            <div class="list-item"><strong>Update</strong><span>Realtime</span></div>
           </div>
         </div>
       </aside>
     </div>
   </main>
 
-  <footer class="footer">Tema: Biru • Putih • Hitam — Dibuat dengan HTML</footer>
+  <footer class="footer">Tema: Biru • Putih • Hitam — Dashboard Publik</footer>
 </body>
 </html>
