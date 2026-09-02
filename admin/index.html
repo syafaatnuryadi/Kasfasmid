@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard - Laporan Keuangan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0b66ff;
+      --primary-dark: #07122b;
+      --primary-soft: #eaf3ff;
+      --text: #0f172a;
+      --text-soft: #64748b;
+      --bg: #f4f8ff;
+      --white: #ffffff;
+      --line: #e5edf9;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; font-family: Inter, Segoe UI, Arial, sans-serif; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 35%, #ffffff 100%);
+      color: var(--text);
+    }
+
+    .auth-shell {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: radial-gradient(circle at top left, #eaf3ff 0%, #f4f8ff 35%, #ffffff 100%);
+    }
+
+    .auth-card {
+      width: min(100%, 440px);
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .auth-card h2 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      letter-spacing: -0.04em;
+    }
+
+    .auth-card p {
+      margin: 0 0 20px;
+      color: var(--text-soft);
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .auth-form input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #f8fbff;
+      font: inherit;
+    }
+
+    .auth-form button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-note {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ffffff, #eaf3ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(11, 102, 255, 0.12);
+    }
+
+    .brand-name {
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .nav-links a, .nav-links button {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      opacity: 0.8;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .nav-links a:hover, .nav-links button:hover { opacity: 1; }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto 40px;
+      padding: 0 16px;
+    }
+
+    .page-header {
+      background: linear-gradient(135deg, #091a32 0%, #0f2a52 30%, #0c6dff 100%);
+      border-radius: 24px;
+      color: white;
+      padding: 26px 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: clamp(2rem, 3vw, 2.5rem);
+      letter-spacing: -0.04em;
+    }
+
+    .page-header p {
+      margin: 10px 0 0;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+      padding: 22px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 1.2rem;
+    }
+
+    form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.92rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    input, select, button {
+      font: inherit;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 12px 14px;
+      color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(11, 102, 255, 0.08);
+    }
+
+    .button-row, .toolbar, .filter-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+      align-items: center;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 10px 24px rgba(11, 102, 255, 0.18);
+    }
+
+    .btn-secondary {
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+    }
+
+    .status {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .status.success {
+      display: block;
+      background: rgba(34, 197, 94, 0.09);
+      color: #166534;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .status.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.08);
+      color: #b91c1c;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .summary-box {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .summary-card {
+      background: #f8fbff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .summary-card h3 {
+      margin: 0 0 8px;
+      color: var(--text-soft);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .summary-card .value {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    thead th {
+      background: linear-gradient(180deg, #0a1630, #0d1d3d);
+      color: #edf5ff;
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 12px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
+      vertical-align: top;
+      color: var(--text);
+    }
+
+    tbody tr:hover {
+      background: #f8fbff;
+    }
+
+    .muted {
+      color: var(--text-soft);
+      font-size: 12px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 28px 12px;
+      color: var(--text-soft);
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .row, .filter-grid { grid-template-columns: 1fr; }
+      .nav { padding: 18px 16px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="dashboard-screen">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo">FK</div>
+        <div>
+          <div class="brand-name">LaporanKeu</div>
+          <div class="brand-sub">Admin dashboard</div>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="index.html">Halaman Pengunjung</a>
+        <button id="logoutBtn" type="button">Logout</button>
+      </div>
+    </div>
+
+    <main class="container">
+      <section class="page-header">
+        <h1>Dashboard Admin</h1>
+        <p>Kelola, filter, dan ekspor laporan keuangan untuk ditampilkan di halaman pengunjung.</p>
+      </section>
+
+      <section class="grid">
+        <div class="panel">
+          <h2>Form Input Laporan</h2>
+          <form id="journal-form">
+            <div class="row">
+              <label>
+                Tanggal
+                <input type="date" id="date" required>
+              </label>
+              <label>
+                No. Jurnal
+                <input type="text" id="journalNo" placeholder="Nomor jurnal" required>
+              </label>
+            </div>
+
+            <div class="row">
+              <label>
+                Jenis Akun
+                <select id="accountType" required>
+                  <option value="asset">Aset</option>
+                  <option value="liability">Liabilitas</option>
+                  <option value="revenue">Pendapatan</option>
+                  <option value="expense">Beban</option>
+                </select>
+              </label>
+              <label>
+                Kategori
+                <select id="category" required>
+                  <option value="Operasional">Operasional</option>
+                  <option value="Penjualan">Penjualan</option>
+                  <option value="Pembelian">Pembelian</option>
+                  <option value="Kas">Kas</option>
+                  <option value="Bank">Bank</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="row">
+              <label>
+                Pelanggan / Mitra
+                <input type="text" id="partner" placeholder="Nama mitra / pelanggan">
+              </label>
+              <label>
+                Jenis Dokumen
+                <select id="documentType">
+                  <option value="Invoice">Invoice</option>
+                  <option value="Nota">Nota</option>
+                  <option value="Bukti Transfer">Bukti Transfer</option>
+                  <option value="Laporan Internal">Laporan Internal</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              Deskripsi
+              <input type="text" id="description" placeholder="Deskripsi transaksi" required>
+            </label>
+
+            <div class="row">
+              <label>
+                Debit (Rp)
+                <input type="number" id="debit" min="0" step="1000" placeholder="0">
+              </label>
+              <label>
+                Kredit (Rp)
+                <input type="number" id="credit" min="0" step="1000" placeholder="0">
+              </label>
+            </div>
+
+            <div class="row">
+              <label>
+                Metode Pembayaran
+                <select id="paymentMethod">
+                  <option value="Tunai">Tunai</option>
+                  <option value="Transfer">Transfer</option>
+                  <option value="E-Wallet">E-Wallet</option>
+                  <option value="Kredit">Kredit</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </label>
+              <label>
+                Catatan
+                <input type="text" id="notes" placeholder="Catatan tambahan">
+              </label>
+            </div>
+
+            <div class="button-row">
+              <button class="btn btn-primary" type="submit">Simpan Data</button>
+            </div>
+          </form>
+
+          <div id="status-message" class="status"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Ringkasan Cepat</h2>
+          <div class="summary-box">
+            <div class="summary-card">
+              <h3>Total Data</h3>
+              <p class="value" id="total-count">0</p>
+            </div>
+            <div class="summary-card">
+              <h3>Total Debit</h3>
+              <p class="value" id="total-debit">Rp 0</p>
+            </div>
+            <div class="summary-card">
+              <h3>Total Kredit</h3>
+              <p class="value" id="total-credit">Rp 0</p>
+            </div>
+            <div class="summary-card">
+              <h3>Net Profit</h3>
+              <p class="value" id="net-profit">Rp 0</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top:22px;">
+        <h2>Filter Laporan</h2>
+        <div class="filter-grid">
+          <label>
+            Bulan
+            <select id="monthFilter">
+              <option value="">Semua Bulan</option>
+              <option value="0">Januari</option>
+              <option value="1">Februari</option>
+              <option value="2">Maret</option>
+              <option value="3">April</option>
+              <option value="4">Mei</option>
+              <option value="5">Juni</option>
+              <option value="6">Juli</option>
+              <option value="7">Agustus</option>
+              <option value="8">September</option>
+              <option value="9">Oktober</option>
+              <option value="10">November</option>
+              <option value="11">Desember</option>
+            </select>
+          </label>
+          <label>
+            Tanggal Mulai
+            <input type="date" id="dateFrom">
+          </label>
+          <label>
+            Tanggal Akhir
+            <input type="date" id="dateTo">
+          </label>
+          <div class="filter-actions">
+            <button class="btn btn-primary" type="button" id="applyFilterBtn">Terapkan</button>
+            <button class="btn btn-secondary" type="button" id="resetFilterBtn">Reset</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top:22px;">
+        <div class="toolbar" style="justify-content:space-between;">
+          <h2 style="margin:0;">Data Laporan</h2>
+          <div class="filter-actions">
+            <button class="btn btn-secondary" type="button" id="exportExcelBtn">Export Excel</button>
+            <button class="btn btn-secondary" type="button" id="exportPdfBtn">Export PDF</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="report-table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>No. Jurnal</th>
+                <th>Deskripsi</th>
+                <th>Kategori</th>
+                <th>Jenis</th>
+                <th>Pelanggan</th>
+                <th>Dokumen</th>
+                <th>Debit</th>
+                <th>Kredit</th>
+                <th>Metode</th>
+                <th>Catatan</th>
+              </tr>
+            </thead>
+            <tbody id="report-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('journal-form');
+      const statusMessage = document.getElementById('status-message');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      function showStatus(message, type) {
+        statusMessage.textContent = message;
+        statusMessage.className = `status ${type}`;
+      }
+
+      logoutBtn.addEventListener('click', () => {
+        showStatus('Logout berhasil.', 'success');
+      });
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        showStatus('Form siap digunakan. Integrasi data dapat ditambahkan di backend nanti.', 'success');
+      });
+    });
+  </script>
+</body>
+</html>
