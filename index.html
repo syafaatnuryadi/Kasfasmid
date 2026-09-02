@@ -108,6 +108,69 @@
       line-height: 1.7;
     }
 
+    .status-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #dfeeff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #72f1b6;
+      box-shadow: 0 0 10px rgba(114, 241, 182, 0.9);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: var(--white);
+      color: var(--primary-dark);
+      box-shadow: 0 10px 24px rgba(11, 17, 32, 0.15);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
     .grid {
       display: grid;
       grid-template-columns: 1.35fr 0.65fr;
@@ -225,6 +288,26 @@
       overflow: hidden;
     }
 
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 0;
+      flex-wrap: wrap;
+    }
+
+    .table-header h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .table-meta {
+      font-size: 12px;
+      color: var(--text-soft);
+      font-weight: 600;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -249,6 +332,19 @@
 
     tbody tr { transition: 0.2s ease; }
     tbody tr:hover { background: #f8fbff; }
+
+    tbody tr.highlight-row {
+      background: rgba(11, 102, 255, 0.02);
+    }
+
+    .empty-state,
+    .loading-state {
+      text-align: center;
+      color: var(--text-soft);
+      padding: 26px 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
 
     .money {
       text-align: right;
@@ -316,6 +412,10 @@
       position: relative;
       height: 180px;
       margin-top: 8px;
+      background: linear-gradient(180deg, rgba(11, 102, 255, 0.03), rgba(255,255,255,0));
+      border: 1px solid rgba(11, 102, 255, 0.08);
+      border-radius: 14px;
+      padding: 8px;
     }
 
     .footer {
@@ -354,17 +454,22 @@
         maximumFractionDigits: 0
       }).format(Number(value || 0));
 
+      const renderLoadingState = () => {
+        tableBody.innerHTML = '<tr><td colspan="4" class="loading-state">Memuat data laporan...</td></tr>';
+      };
+
       const renderTable = (rows) => {
         if (!rows.length) {
-          tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#64748b;">Belum ada data laporan.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="4" class="empty-state">Belum ada data laporan untuk ditampilkan.</td></tr>';
           return;
         }
 
-        tableBody.innerHTML = rows.map((entry) => {
+        tableBody.innerHTML = rows.map((entry, index) => {
           const date = entry.date || entry.createdAt || '-';
           const debit = Number(entry.debit || 0);
           const credit = Number(entry.credit || 0);
-          return `<tr><td>${date}</td><td>${entry.description || 'Tanpa deskripsi'}</td><td class="money">${formatCurrency(debit)}</td><td class="money">${formatCurrency(credit)}</td></tr>`;
+          const highlightClass = index === 0 ? 'highlight-row' : '';
+          return `<tr class="${highlightClass}"><td>${date}</td><td>${entry.description || 'Tanpa deskripsi'}</td><td class="money">${formatCurrency(debit)}</td><td class="money">${formatCurrency(credit)}</td></tr>`;
         }).join('');
       };
 
@@ -388,6 +493,8 @@
       };
 
       try {
+        renderLoadingState();
+
         const firebaseApi = window.LaporanKeuFirebase;
         if (!firebaseApi || !firebaseApi.isReady) {
           totalAssetsEl.textContent = formatCurrency(0);
@@ -413,7 +520,7 @@
         totalAssetsEl.textContent = formatCurrency(0);
         totalLiabEl.textContent = formatCurrency(0);
         netIncomeEl.textContent = formatCurrency(0);
-        renderTable([]);
+        tableBody.innerHTML = '<tr><td colspan="4" class="empty-state">Gagal memuat data dari database. Silakan cek konfigurasi Firebase.</td></tr>';
       }
     });
   </script>
@@ -436,6 +543,14 @@
     <header class="page-header">
       <h1>Ringkasan Bisnis Anda</h1>
       <p>Pantau aset, liabilitas, dan performa keuangan secara ringkas dalam satu tampilan yang konsisten dengan dashboard admin.</p>
+
+      <div class="status-strip">
+        <div class="live-pill"><span class="live-dot"></span>Live data</div>
+        <div class="header-actions">
+          <button class="btn btn-primary" type="button">Lihat detail</button>
+          <button class="btn btn-secondary" type="button">Cek laporan</button>
+        </div>
+      </div>
     </header>
 
     <div class="grid">
@@ -472,6 +587,10 @@
         </div>
 
         <div class="table-wrap">
+          <div class="table-header">
+            <h3>Jurnal Terbaru</h3>
+            <div class="table-meta">Data real-time</div>
+          </div>
           <table id="journal-table">
             <thead>
               <tr>
