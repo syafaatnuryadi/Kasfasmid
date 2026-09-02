@@ -381,7 +381,7 @@
         </div>
       </div>
       <div class="nav-links">
-        <a href="index.html">Halaman Pengunjung</a>
+        <a href="../">Halaman Pengunjung</a>
         <button id="logoutBtn" type="button">Logout</button>
       </div>
     </div>
@@ -580,24 +580,221 @@
     </main>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="../firebase-config.js"></script>
+  <script src="../firebase-app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const form = document.getElementById('journal-form');
       const statusMessage = document.getElementById('status-message');
       const logoutBtn = document.getElementById('logoutBtn');
+      const tableBody = document.getElementById('report-body');
+      const totalCountEl = document.getElementById('total-count');
+      const totalDebitEl = document.getElementById('total-debit');
+      const totalCreditEl = document.getElementById('total-credit');
+      const netProfitEl = document.getElementById('net-profit');
+      const monthFilter = document.getElementById('monthFilter');
+      const dateFrom = document.getElementById('dateFrom');
+      const dateTo = document.getElementById('dateTo');
+      const applyFilterBtn = document.getElementById('applyFilterBtn');
+      const resetFilterBtn = document.getElementById('resetFilterBtn');
+      const exportExcelBtn = document.getElementById('exportExcelBtn');
+      const exportPdfBtn = document.getElementById('exportPdfBtn');
+      const basePath = '../';
+
+      const formatCurrency = (value) => new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0
+      }).format(Number(value || 0));
 
       function showStatus(message, type) {
         statusMessage.textContent = message;
         statusMessage.className = `status ${type}`;
       }
 
-      logoutBtn.addEventListener('click', () => {
-        showStatus('Logout berhasil.', 'success');
+      function buildReportRow(entry) {
+        const date = entry.date || entry.createdAt || '-';
+        return `
+          <tr>
+            <td>${date}</td>
+            <td>${entry.journalNo || '-'}</td>
+            <td>${entry.description || '-'}</td>
+            <td>${entry.category || '-'}</td>
+            <td>${entry.accountType || '-'}</td>
+            <td>${entry.partner || '-'}</td>
+            <td>${entry.documentType || '-'}</td>
+            <td class="money">${formatCurrency(entry.debit || 0)}</td>
+            <td class="money">${formatCurrency(entry.credit || 0)}</td>
+            <td>${entry.paymentMethod || '-'}</td>
+            <td>${entry.notes || '-'}</td>
+          </tr>
+        `;
+      }
+
+      function renderTable(rows) {
+        if (!rows.length) {
+          tableBody.innerHTML = '<tr><td colspan="11" class="empty-state">Belum ada data laporan.</td></tr>';
+          return;
+        }
+        tableBody.innerHTML = rows.map(buildReportRow).join('');
+      }
+
+      function updateSummary(rows) {
+        totalCountEl.textContent = String(rows.length);
+        const totalDebit = rows.reduce((sum, item) => sum + Number(item.debit || 0), 0);
+        const totalCredit = rows.reduce((sum, item) => sum + Number(item.credit || 0), 0);
+        totalDebitEl.textContent = formatCurrency(totalDebit);
+        totalCreditEl.textContent = formatCurrency(totalCredit);
+        netProfitEl.textContent = formatCurrency(totalCredit - totalDebit);
+      }
+
+      function applyFilter(rows) {
+        const monthValue = monthFilter.value;
+        const startDate = dateFrom.value;
+        const endDate = dateTo.value;
+
+        return rows.filter((item) => {
+          const date = item.date || '';
+          const monthOk = !monthValue || new Date(date).getMonth() === Number(monthValue);
+          const startOk = !startDate || date >= startDate;
+          const endOk = !endDate || date <= endDate;
+          return monthOk && startOk && endOk;
+        });
+      }
+
+      async function loadReports() {
+        const firebaseApi = window.LaporanKeuFirebase;
+        if (!firebaseApi || !firebaseApi.isReady) {
+          showStatus('Firebase belum siap. Cek konfigurasi aplikasi.', 'error');
+          return;
+        }
+
+        try {
+          const rows = await firebaseApi.loadReports();
+          const filteredRows = applyFilter(rows);
+          renderTable(filteredRows);
+          updateSummary(filteredRows);
+        } catch (error) {
+          console.error('Gagal memuat laporan:', error);
+          showStatus('Gagal memuat laporan dari Firebase.', 'error');
+        }
+      }
+
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          window.location.href = basePath + 'login/';
+          return;
+        }
+        loadReports();
       });
 
-      form.addEventListener('submit', (event) => {
+      logoutBtn.addEventListener('click', async () => {
+        try {
+          const firebaseApi = window.LaporanKeuFirebase;
+          if (firebaseApi && firebaseApi.isReady) {
+            await firebaseApi.logout();
+          }
+          window.location.href = basePath + 'login/';
+        } catch (error) {
+          showStatus('Logout gagal.', 'error');
+        }
+      });
+
+      applyFilterBtn.addEventListener('click', loadReports);
+      resetFilterBtn.addEventListener('click', () => {
+        monthFilter.value = '';
+        dateFrom.value = '';
+        dateTo.value = '';
+        loadReports();
+      });
+
+      exportExcelBtn.addEventListener('click', async () => {
+        try {
+          const rows = await window.LaporanKeuFirebase.loadReports();
+          const ws = XLSX.utils.json_to_sheet(rows.map((item) => ({
+            Tanggal: item.date || '',
+            'No. Jurnal': item.journalNo || '',
+            Deskripsi: item.description || '',
+            Kategori: item.category || '',
+            Jenis: item.accountType || '',
+            Pelanggan: item.partner || '',
+            Dokumen: item.documentType || '',
+            Debit: Number(item.debit || 0),
+            Kredit: Number(item.credit || 0),
+            Metode: item.paymentMethod || '',
+            Catatan: item.notes || ''
+          })));
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'Laporan');
+          XLSX.writeFile(wb, 'laporan-keuangan.xlsx');
+        } catch (error) {
+          showStatus('Export Excel gagal.', 'error');
+        }
+      });
+
+      exportPdfBtn.addEventListener('click', async () => {
+        try {
+          const rows = await window.LaporanKeuFirebase.loadReports();
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+          const tableData = rows.map((item) => [
+            item.date || '',
+            item.journalNo || '',
+            item.description || '',
+            formatCurrency(item.debit || 0),
+            formatCurrency(item.credit || 0)
+          ]);
+          doc.autoTable({
+            head: [['Tanggal', 'No. Jurnal', 'Deskripsi', 'Debit', 'Kredit']],
+            body: tableData
+          });
+          doc.save('laporan-keuangan.pdf');
+        } catch (error) {
+          showStatus('Export PDF gagal.', 'error');
+        }
+      });
+
+      form.addEventListener('submit', async (event) => {
         event.preventDefault();
-        showStatus('Form siap digunakan. Integrasi data dapat ditambahkan di backend nanti.', 'success');
+        const firebaseApi = window.LaporanKeuFirebase;
+        if (!firebaseApi || !firebaseApi.isReady) {
+          showStatus('Firebase belum siap. Cek konfigurasi aplikasi.', 'error');
+          return;
+        }
+
+        const payload = {
+          date: document.getElementById('date').value,
+          journalNo: document.getElementById('journalNo').value.trim(),
+          accountType: document.getElementById('accountType').value,
+          category: document.getElementById('category').value,
+          partner: document.getElementById('partner').value.trim(),
+          documentType: document.getElementById('documentType').value,
+          description: document.getElementById('description').value.trim(),
+          debit: document.getElementById('debit').value,
+          credit: document.getElementById('credit').value,
+          paymentMethod: document.getElementById('paymentMethod').value,
+          notes: document.getElementById('notes').value.trim()
+        };
+
+        if (!payload.date || !payload.journalNo || !payload.description) {
+          showStatus('Tanggal, nomor jurnal, dan deskripsi wajib diisi.', 'error');
+          return;
+        }
+
+        try {
+          await firebaseApi.saveReport(payload);
+          form.reset();
+          showStatus('Data laporan berhasil disimpan ke Firebase.', 'success');
+          loadReports();
+        } catch (error) {
+          showStatus(error.message || 'Data gagal disimpan.', 'error');
+        }
       });
     });
   </script>
