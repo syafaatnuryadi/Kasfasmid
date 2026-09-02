@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aplikasi Laporan Keuangan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+  :root{
+    --primary:#0b66ff;
+    --primary-dark:#07122b;
+    --primary-soft:#eaf3ff;
+    --text:#0f172a;
+    --text-soft:#64748b;
+    --bg:#f4f8ff;
+    --white:#ffffff;
+    --line:#e5edf9;
+    --success:#22c55e;
+    --danger:#ef4444;
+    --shadow:0 18px 42px rgba(15,23,42,0.08);
+  }
+  *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:radial-gradient(circle at top left,#eaf3ff 0%, var(--bg) 28%, #ffffff 100%);color:var(--text)}
+
+  /* Navbar / Hero */
+  .nav{display:flex;justify-content:space-between;align-items:center;padding:22px 32px;max-width:1200px;margin:0 auto;gap:16px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#ffffff,#eaf3ff);display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:800;box-shadow:0 10px 24px rgba(11,102,255,0.12)}
+  .brand-name{font-weight:800;font-size:1.05rem}
+  .brand-sub{font-size:12px;color:var(--text-soft)}
+  .nav a{color:var(--text);text-decoration:none;margin-left:14px;font-weight:600;opacity:.8}
+  .nav a:hover{opacity:1}
+  .nav .links{display:flex;align-items:center;gap:12px}
+
+  .hero{max-width:1200px;margin:12px auto;padding:28px 28px 20px;border-radius:24px;background:linear-gradient(135deg,#091a32 0%,#0f2a52 28%,#0c6dff 100%);display:flex;gap:24px;align-items:stretch;box-shadow:var(--shadow)}
+  .hero-left{flex:1;padding:10px 0}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.12);color:#dfeeff;border:1px solid rgba(255,255,255,0.15);font-size:12px;font-weight:700;letter-spacing:.02em;margin-bottom:18px}
+  .hero-badge::before{content:"";display:block;width:8px;height:8px;border-radius:50%;background:#72f1b6;box-shadow:0 0 14px rgba(114,241,182,0.9)}
+  .hero h1{margin:0;font-size:clamp(2rem,4vw,3rem);color:#ffffff;line-height:1.08;letter-spacing:-.04em;max-width:620px}
+  .hero p{color:rgba(255,255,255,0.8);margin-top:12px;max-width:560px;line-height:1.7}
+  .hero .cta{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap}
+  .btn{appearance:none;border:none;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer;transition:.2s ease}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-primary{background:var(--white);color:var(--primary-dark);box-shadow:0 10px 24px rgba(11,17,32,0.15)}
+  .btn-secondary{background:rgba(255,255,255,0.08);color:var(--white);border:1px solid rgba(255,255,255,0.2)}
+
+  .hero-right{width:340px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:18px 18px 14px;backdrop-filter:blur(4px)}
+  .hero-right h4{margin:0 0 10px 0;color:#f8fbff;font-size:0.95rem}
+  .hero-right .summary{margin:0;font-size:1.1rem;font-weight:700;color:#fff}
+  .hero-right .summary-note{margin-top:8px;color:rgba(255,255,255,0.7);font-size:12px}
+
+  /* Dashboard grid */
+  .container{max-width:1200px;margin:26px auto;padding:0 16px 32px}
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+  .cards{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:14px}
+  .card{background:var(--white);padding:18px 18px 16px;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 24px rgba(15,23,42,0.04);position:relative;overflow:hidden}
+  .card::after{content:"";position:absolute;inset:auto -30px -30px auto;width:110px;height:110px;border-radius:50%;background:rgba(11,102,255,0.04)}
+  .card-header{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+  .card-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem}
+  .card-icon.blue{background:rgba(11,102,255,0.1);color:var(--primary)}
+  .card-icon.dark{background:rgba(7,18,43,0.08);color:var(--primary-dark)}
+  .card-icon.green{background:rgba(34,197,94,0.1);color:var(--success)}
+  .trend{padding:6px 8px;border-radius:999px;font-size:11px;font-weight:700;position:relative;z-index:1}
+  .trend.positive{background:rgba(34,197,94,0.12);color:#15803d}
+  .trend.negative{background:rgba(239,68,68,0.10);color:#b91c1c}
+  .card h3{margin:18px 0 8px 0;font-size:13px;color:var(--text-soft);font-weight:700;letter-spacing:.02em;position:relative;z-index:1}
+  .card p{font-size:1.8rem;margin:0;font-weight:800;letter-spacing:-.04em;color:var(--text);position:relative;z-index:1}
+
+  .panel-table{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:0;overflow:hidden;box-shadow:0 10px 24px rgba(15,23,42,0.04)}
+  .panel-table h2{margin:0;padding:18px 18px 10px;font-size:1.2rem}
+  table{width:100%;border-collapse:collapse;background:var(--white)}
+  thead th{background:linear-gradient(180deg,#0a1630,#0d1d3d);color:#edf5ff;text-align:left;padding:12px 14px;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+  tbody td{padding:12px 14px;border-top:1px solid var(--line);color:var(--text)}
+  tbody tr{transition:.2s ease}
+  tbody tr:hover{background:#f8fbff}
+  .money{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+
+  .right-panel{display:flex;flex-direction:column;gap:14px}
+  .mini-card{background:var(--white);padding:18px;border-radius:18px;border:1px solid var(--line);box-shadow:0 10px 24px rgba(15,23,42,0.04)}
+  .mini-card h4{margin:0 0 12px;font-size:0.95rem;color:var(--text)}
+  .mini-card .product{font-weight:800;margin:0;color:var(--text);font-size:1rem}
+  .mini-card .meta{margin-top:5px;color:var(--text-soft);font-size:13px}
+  .mini-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .mini-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .mini-item:last-child{border-bottom:none}
+  .mini-item strong{font-size:13px;color:var(--text-soft)}
+
+  .chart{margin-top:0;background:transparent;padding:0;border-radius:8px}
+  .footer{padding:22px 14px 40px;text-align:center;color:var(--text-soft);font-size:13px}
+
+  @media (max-width:980px){
+    .nav{padding:18px 16px}
+    .links{display:none}
+    .hero{padding:22px 18px;border-radius:18px;flex-direction:column}
+    .hero-right{width:100%}
+    .grid{grid-template-columns:1fr}
+    .cards{grid-template-columns:1fr}
+  }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const totalAssetsEl = document.getElementById('total-assets');
+      const totalLiabEl = document.getElementById('total-liabilities');
+      const netIncomeEl = document.getElementById('net-income');
+      const tableBody = document.querySelector('#journal-table tbody');
+
+      const mockEntries = [
+        { date: '2026-09-01', description: 'Saldo awal', debit: 12000000, credit: 0, accountType: 'asset' },
+        { date: '2026-09-02', description: 'Pendapatan usaha', debit: 0, credit: 2500000, accountType: 'revenue' },
+        { date: '2026-09-03', description: 'Pembelian perlengkapan', debit: 1500000, credit: 0, accountType: 'expense' }
+      ];
+
+      let assets = 0;
+      let liabilities = 0;
+      let revenue = 0;
+      let expenses = 0;
+
+      tableBody.innerHTML = mockEntries.map((entry) => {
+        const debit = Number(entry.debit || 0);
+        const credit = Number(entry.credit || 0);
+
+        if (entry.accountType === 'asset') assets += (debit - credit);
+        if (entry.accountType === 'liability') liabilities += (credit - debit);
+        if (entry.accountType === 'revenue') revenue += (credit - debit);
+        if (entry.accountType === 'expense') expenses += (debit - credit);
+
+        return `<tr><td>${entry.date}</td><td>${entry.description}</td><td>${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(debit)}</td><td>${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(credit)}</td></tr>`;
+      }).join('');
+
+      totalAssetsEl.textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(assets);
+      totalLiabEl.textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(liabilities);
+      netIncomeEl.textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(revenue - expenses);
+
+      const ctx = document.getElementById('chart-compo').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Aset', 'Liabilitas', 'Pendapatan', 'Beban'],
+          datasets: [{
+            data: [Math.abs(assets), Math.abs(liabilities), Math.abs(revenue), Math.abs(expenses)],
+            backgroundColor: ['#0b66ff', '#0b0b0b', '#2b8aff', '#ff6b6b']
+          }]
+        },
+        options: { responsive: true }
+      });
+    });
+  </script>
+</head>
+</body>
+  <div class="nav">
+    <div class="brand">
+      <div class="logo">FK</div>
+      <div>
+        <div class="brand-name">LaporanKeu</div>
+        <div class="brand-sub">Visitor dashboard</div>
+      </div>
+    </div>
+    <div class="links">
+      <a href="index.html">Pengunjung</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-badge">Ringkasan • Keuangan • Umum</div>
+      <h1>Ringkasan Bisnis Anda — Laporan Keuangan</h1>
+      <p>Pantau aset, liabilitas, dan performa keuangan secara ringkas dalam satu tampilan yang sederhana dan mudah dibaca.</p>
+      <div class="cta" style="display:none;"></div>
+    </div>
+    <div class="hero-right">
+      <h4>Ringkasan data</h4>
+      <p class="summary">Tampilan status laporan keuangan</p>
+      <div class="summary-note">Data dapat diperbarui sesuai kebutuhan aplikasi</div>
+      <div style="height:120px;margin-top:12px"><canvas id="chart-compo" width="320" height="120"></canvas></div>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="grid">
+      <div>
+        <div class="cards">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon blue">A</div>
+              <span class="trend positive">+8.4%</span>
+            </div>
+            <h3>Total Aset</h3>
+            <p id="total-assets">0</p>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon dark">L</div>
+              <span class="trend negative">-1.2%</span>
+            </div>
+            <h3>Total Liabilitas</h3>
+            <p id="total-liabilities">0</p>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon green">P</div>
+              <span class="trend positive">+15.6%</span>
+            </div>
+            <h3>Laba / Rugi</h3>
+            <p id="net-income">0</p>
+          </div>
+        </div>
+
+        <div class="panel-table" style="margin-top:18px">
+          <h2>Jurnal Terbaru</h2>
+          <table id="journal-table">
+            <thead>
+              <tr><th>Tanggal</th><th>Deskripsi</th><th>Debit</th><th>Kredit</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <aside class="right-panel">
+        <div class="mini-card">
+          <h4>Data Terbaru</h4>
+          <div class="product">Informasi keuangan tersedia dalam tampilan publik</div>
+          <div class="meta">Siap ditampilkan untuk pengunjung</div>
+        </div>
+
+        <div class="mini-card">
+          <h4>Status Sistem</h4>
+          <div class="mini-list">
+            <div class="mini-item"><strong>Mode</strong><span>Publik</span></div>
+            <div class="mini-item"><strong>Status</strong><span>Siap</span></div>
+            <div class="mini-item"><strong>Update</strong><span>Manual</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer">Tema: Biru • Putih • Hitam — Dibuat dengan HTML</footer>
+</body>
+</html>
