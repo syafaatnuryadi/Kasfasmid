@@ -100,52 +100,86 @@
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="./firebase-config.js"></script>
+  <script src="./firebase-app.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       const totalAssetsEl = document.getElementById('total-assets');
       const totalLiabEl = document.getElementById('total-liabilities');
       const netIncomeEl = document.getElementById('net-income');
       const tableBody = document.querySelector('#journal-table tbody');
+      const chartCanvas = document.getElementById('chart-compo');
 
-      const mockEntries = [
-        { date: '2026-09-01', description: 'Saldo awal', debit: 12000000, credit: 0, accountType: 'asset' },
-        { date: '2026-09-02', description: 'Pendapatan usaha', debit: 0, credit: 2500000, accountType: 'revenue' },
-        { date: '2026-09-03', description: 'Pembelian perlengkapan', debit: 1500000, credit: 0, accountType: 'expense' }
-      ];
+      const formatCurrency = (value) => new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0
+      }).format(Number(value || 0));
 
-      let assets = 0;
-      let liabilities = 0;
-      let revenue = 0;
-      let expenses = 0;
+      const renderTable = (rows) => {
+        if (!rows.length) {
+          tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#64748b;">Belum ada data laporan.</td></tr>';
+          return;
+        }
 
-      tableBody.innerHTML = mockEntries.map((entry) => {
-        const debit = Number(entry.debit || 0);
-        const credit = Number(entry.credit || 0);
+        tableBody.innerHTML = rows.map((entry) => {
+          const date = entry.date || entry.createdAt || '-';
+          const debit = Number(entry.debit || 0);
+          const credit = Number(entry.credit || 0);
+          return `<tr><td>${date}</td><td>${entry.description || 'Tanpa deskripsi'}</td><td class="money">${formatCurrency(debit)}</td><td class="money">${formatCurrency(credit)}</td></tr>`;
+        }).join('');
+      };
 
-        if (entry.accountType === 'asset') assets += (debit - credit);
-        if (entry.accountType === 'liability') liabilities += (credit - debit);
-        if (entry.accountType === 'revenue') revenue += (credit - debit);
-        if (entry.accountType === 'expense') expenses += (debit - credit);
+      const renderChart = (assets, liabilities, revenue, expenses) => {
+        if (!chartCanvas) return;
+        const ctx = chartCanvas.getContext('2d');
+        if (window.__laporanKeuChart) {
+          window.__laporanKeuChart.destroy();
+        }
+        window.__laporanKeuChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Aset', 'Liabilitas', 'Pendapatan', 'Beban'],
+            datasets: [{
+              data: [Math.abs(assets), Math.abs(liabilities), Math.abs(revenue), Math.abs(expenses)],
+              backgroundColor: ['#0b66ff', '#0b0b0b', '#2b8aff', '#ff6b6b']
+            }]
+          },
+          options: { responsive: true }
+        });
+      };
 
-        return `<tr><td>${entry.date}</td><td>${entry.description}</td><td>${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(debit)}</td><td>${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(credit)}</td></tr>`;
-      }).join('');
+      try {
+        const firebaseApi = window.LaporanKeuFirebase;
+        if (!firebaseApi || !firebaseApi.isReady) {
+          totalAssetsEl.textContent = formatCurrency(0);
+          totalLiabEl.textContent = formatCurrency(0);
+          netIncomeEl.textContent = formatCurrency(0);
+          renderTable([]);
+          return;
+        }
 
-      totalAssetsEl.textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(assets);
-      totalLiabEl.textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(liabilities);
-      netIncomeEl.textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(revenue - expenses);
+        const reports = await firebaseApi.loadReports();
+        const assets = reports.reduce((sum, item) => sum + Number(item.accountType === 'asset' ? (item.debit || 0) - (item.credit || 0) : 0), 0);
+        const liabilities = reports.reduce((sum, item) => sum + Number(item.accountType === 'liability' ? (item.credit || 0) - (item.debit || 0) : 0), 0);
+        const revenue = reports.reduce((sum, item) => sum + Number(item.accountType === 'revenue' ? (item.credit || 0) - (item.debit || 0) : 0), 0);
+        const expenses = reports.reduce((sum, item) => sum + Number(item.accountType === 'expense' ? (item.debit || 0) - (item.credit || 0) : 0), 0);
 
-      const ctx = document.getElementById('chart-compo').getContext('2d');
-      new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Aset', 'Liabilitas', 'Pendapatan', 'Beban'],
-          datasets: [{
-            data: [Math.abs(assets), Math.abs(liabilities), Math.abs(revenue), Math.abs(expenses)],
-            backgroundColor: ['#0b66ff', '#0b0b0b', '#2b8aff', '#ff6b6b']
-          }]
-        },
-        options: { responsive: true }
-      });
+        totalAssetsEl.textContent = formatCurrency(assets);
+        totalLiabEl.textContent = formatCurrency(liabilities);
+        netIncomeEl.textContent = formatCurrency(revenue - expenses);
+        renderTable(reports.slice(0, 8));
+        renderChart(assets, liabilities, revenue, expenses);
+      } catch (error) {
+        console.error('Gagal memuat data publik dari Firebase:', error);
+        totalAssetsEl.textContent = formatCurrency(0);
+        totalLiabEl.textContent = formatCurrency(0);
+        netIncomeEl.textContent = formatCurrency(0);
+        renderTable([]);
+      }
     });
   </script>
 </head>
@@ -159,7 +193,7 @@
       </div>
     </div>
     <div class="links">
-      <a href="index.html">Pengunjung</a>
+      <a href="./">Pengunjung</a>
     </div>
   </div>
 
