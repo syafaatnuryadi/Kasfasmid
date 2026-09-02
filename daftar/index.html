@@ -224,20 +224,26 @@
     <div id="registerStatus" class="status"></div>
 
     <div class="link-row">
-      Sudah punya akun? <a href="login.html">Login di sini</a>
+      Sudah punya akun? <a href="../login/">Login di sini</a>
     </div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="../firebase-config.js"></script>
+  <script src="../firebase-app.js"></script>
   <script>
     const registerBtn = document.getElementById('registerBtn');
     const registerStatus = document.getElementById('registerStatus');
+    const basePath = '../';
 
     function showStatus(message, type) {
       registerStatus.textContent = message;
       registerStatus.className = `status ${type}`;
     }
 
-    registerBtn.addEventListener('click', () => {
+    registerBtn.addEventListener('click', async () => {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
 
@@ -251,7 +257,23 @@
         return;
       }
 
-      showStatus('Pendaftaran berhasil. Silakan lanjutkan ke halaman login.', 'success');
+      try {
+        const firebaseApi = window.LaporanKeuFirebase;
+        if (!firebaseApi || !firebaseApi.isReady) {
+          showStatus('Firebase belum siap. Cek konfigurasi aplikasi.', 'error');
+          return;
+        }
+
+        showStatus('Membuat akun admin...', 'success');
+        await firebaseApi.register(email, password);
+        showStatus('Akun berhasil dibuat. Silakan login.', 'success');
+        setTimeout(() => {
+          window.location.href = basePath + 'login/';
+        }, 1200);
+      } catch (error) {
+        const message = error && error.message ? error.message : 'Pendaftaran gagal.';
+        showStatus(message, 'error');
+      }
     });
   </script>
 </body>
