@@ -686,13 +686,22 @@
         }
       }
 
-      firebase.auth().onAuthStateChanged((user) => {
-        if (!user) {
+      function requireAuth() {
+        if (!window.firebase || !window.firebase.auth) {
           window.location.href = basePath + 'login/';
           return;
         }
-        loadReports();
-      });
+
+        window.firebase.auth().onAuthStateChanged((user) => {
+          if (!user) {
+            window.location.href = basePath + 'login/';
+            return;
+          }
+          loadReports();
+        });
+      }
+
+      requireAuth();
 
       logoutBtn.addEventListener('click', async () => {
         try {
