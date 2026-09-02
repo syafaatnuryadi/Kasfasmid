@@ -229,21 +229,27 @@
 
     <div id="loginStatus" class="status"></div>
     <div class="link-row">
-      Belum punya akun? <a href="register.html">Daftar admin</a>
+      Belum punya akun? <a href="../register/">Daftar admin</a>
     </div>
     <div class="note">Akun admin dapat dibuat di halaman pendaftaran.</div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="../firebase-config.js"></script>
+  <script src="../firebase-app.js"></script>
   <script>
     const loginBtn = document.getElementById('loginBtn');
     const loginStatus = document.getElementById('loginStatus');
+    const basePath = '../';
 
     function showStatus(message, type) {
       loginStatus.textContent = message;
       loginStatus.className = `status ${type}`;
     }
 
-    loginBtn.addEventListener('click', () => {
+    loginBtn.addEventListener('click', async () => {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
 
@@ -252,7 +258,19 @@
         return;
       }
 
-      showStatus('Login berhasil. Anda akan diarahkan ke halaman admin.', 'success');
+      try {
+        const firebaseApi = window.LaporanKeuFirebase;
+        if (!firebaseApi || !firebaseApi.isReady) {
+          showStatus('Firebase belum siap. Cek konfigurasi aplikasi.', 'error');
+          return;
+        }
+
+        showStatus('Memproses login...', 'success');
+        await firebaseApi.login(email, password);
+        window.location.href = basePath + 'admin/';
+      } catch (error) {
+        showStatus(error.message || 'Login gagal. Periksa email dan password Anda.', 'error');
+      }
     });
   </script>
 </body>
