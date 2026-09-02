@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aplikasi Laporan Keuangan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+  :root{
+    --blue:#0b66ff;
+    --dark:#0b0b0b;
+    --white:#ffffff;
+    --muted:#f4f6fb;
+    --muted-2: #eef6ff;
+  }
+  *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif}
+  body{margin:0;background:linear-gradient(180deg,var(--muted),#ffffff);color:var(--dark)}
+
+  /* Navbar / Hero */
+  .nav{display:flex;justify-content:space-between;align-items:center;padding:20px 28px;max-width:1200px;margin:0 auto}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:42px;height:42px;border-radius:8px;background:var(--white);display:flex;align-items:center;justify-content:center;color:var(--blue);font-weight:700;box-shadow:0 4px 14px rgba(11,102,255,0.08)}
+  .nav a{color:var(--dark);text-decoration:none;margin-left:14px;font-weight:600}
+
+  .hero{max-width:1200px;margin:12px auto;padding:28px;border-radius:12px;background:linear-gradient(90deg,var(--white),var(--muted-2));display:flex;gap:20px;align-items:center}
+  .hero-left{flex:1}
+  .hero h1{margin:0;font-size:28px;color:var(--dark);line-height:1.06}
+  .hero p{color:#334155;margin-top:8px}
+  .hero .cta{margin-top:14px}
+  .cta .btn{margin-right:8px}
+
+  .hero-right{width:320px}
+
+  /* Dashboard grid */
+  .container{max-width:1200px;margin:18px auto;padding:0 16px}
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+  .cards{display:flex;gap:12px}
+  .card{flex:1;background:var(--white);padding:18px;border-radius:10px;box-shadow:0 6px 18px rgba(11,102,255,0.06)}
+  .card h3{margin:0 0 8px 0;font-size:13px;color:var(--blue);font-weight:700}
+  .card p{font-size:20px;margin:0;font-weight:700}
+
+  table{width:100%;border-collapse:collapse;background:var(--white);border-radius:8px;overflow:hidden}
+  thead th{background:#07122b;color:var(--white);text-align:left;padding:10px}
+  tbody td{padding:10px;border-top:1px solid #f1f5fb}
+
+  .right-panel{display:flex;flex-direction:column;gap:12px}
+  .small{background:var(--white);padding:12px;border-radius:10px}
+
+  .chart{margin-top:0;background:transparent;padding:0;border-radius:8px}
+  .footer{padding:24px;text-align:center;color:#666}
+
+  @media (max-width:980px){.grid{grid-template-columns:1fr}.nav,.hero{padding:12px}.hero-right{display:none}}
+  </style>
+
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <!-- Chart.js for simple charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script src="firebase-config.js"></script>
+
+  <script>
+  // Inline JS: Basic Firebase + Firestore integration (compat SDK)
+  document.addEventListener('DOMContentLoaded', ()=>{
+    if(!window.FIREBASE_CONFIG){
+      console.warn('firebase config belum diisi. Lengkapi WINDOW.FIREBASE_CONFIG di file index.html');
+    }
+
+    // init firebase
+    try{
+      firebase.initializeApp(window.FIREBASE_CONFIG);
+      window.db = firebase.firestore();
+    }catch(e){console.warn('Firebase init error',e)}
+
+    const tableBody = document.querySelector('#journal-table tbody');
+    const totalAssetsEl = document.getElementById('total-assets');
+    const totalLiabEl = document.getElementById('total-liabilities');
+    const netIncomeEl = document.getElementById('net-income');
+
+    function formatCurrency(v){
+      return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(v);
+    }
+
+    // render helper
+    function render(entries){
+      tableBody.innerHTML='';
+      let assets=0, liabilities=0, revenue=0, expenses=0;
+      entries.forEach(doc=>{
+        const data = doc.data();
+        const date = data.date && data.date.toDate ? data.date.toDate().toLocaleDateString() : '';
+        const debit = data.debit || 0;
+        const credit = data.credit || 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${date}</td><td>${(data.description||'')}</td><td>${formatCurrency(debit)}</td><td>${formatCurrency(credit)}</td>`;
+        tableBody.appendChild(tr);
+
+        // simple mapping by accountType field if present
+        if(data.accountType==='asset') assets += (debit - credit);
+        if(data.accountType==='liability') liabilities += (credit - debit);
+        if(data.accountType==='revenue') revenue += (credit - debit);
+        if(data.accountType==='expense') expenses += (debit - credit);
+      });
+
+      totalAssetsEl.textContent = formatCurrency(assets);
+      totalLiabEl.textContent = formatCurrency(liabilities);
+      netIncomeEl.textContent = formatCurrency(revenue - expenses);
+
+      // chart
+      const ctx = document.getElementById('chart-compo').getContext('2d');
+      if(window._chart) window._chart.destroy();
+      window._chart = new Chart(ctx,{
+        type:'doughnut',
+        data:{labels:['Aset','Liabilitas','Pendapatan','Beban'],datasets:[{data:[Math.abs(assets),Math.abs(liabilities),Math.abs(revenue),Math.abs(expenses)],backgroundColor:['#0b66ff','#0b0b0b','#2b8aff','#ff6b6b']}]},
+        options:{responsive:true}
+      });
+    }
+
+    // fetch from firestore
+    function subscribe(){
+      if(!window.db) return;
+      window.db.collection('journalEntries').orderBy('date','desc').onSnapshot(snapshot=>{
+        render(snapshot.docs);
+      });
+    }
+
+    // sample add
+    document.getElementById('btn-sample').addEventListener('click',async ()=>{
+      if(!window.db){alert('Firebase belum disiapkan. Lihat README.');return}
+      await window.db.collection('journalEntries').add({
+        date: firebase.firestore.Timestamp.fromDate(new Date()),
+        description: 'Penjualan contoh',
+        debit: 0,
+        credit: 15000000,
+        accountType: 'revenue'
+      });
+      await window.db.collection('journalEntries').add({
+        date: firebase.firestore.Timestamp.fromDate(new Date()),
+        description: 'Kas masuk',
+        debit: 15000000,
+        credit: 0,
+        accountType: 'asset'
+      });
+    });
+
+    subscribe();
+  });
+  </script>
+</head>
+</body>
+  <div class="nav">
+    <div class="brand">
+      <div class="logo">FK</div>
+      <div>
+        <div style="font-weight:800">LaporanKeu</div>
+        <div style="font-size:12px;color:#475569">Dashboard sederhana</div>
+      </div>
+    </div>
+    <div class="links">
+      <a href="#">Dashboard</a>
+      <a href="#">Transaksi</a>
+      <a href="#">Laporan</a>
+      <a href="#">Pengaturan</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="hero-left">
+      <h1>Ringkasan Bisnis Anda — Laporan Keuangan Real-time</h1>
+      <p>Pantau aset, liabilitas, dan performa keuangan. Data tersimpan di Firebase dan dapat diakses kapan saja.</p>
+      <div class="cta">
+        <button class="btn">Buat Jurnal</button>
+        <button id="btn-sample" class="btn ghost">Tambah Contoh</button>
+      </div>
+    </div>
+    <div class="hero-right small">
+      <h4 style="margin:0 0 8px 0">Ringkasan minggu ini</h4>
+      <p style="margin:0;font-size:18px;font-weight:700">Penjualan: Rp 8.450.000</p>
+      <div style="height:120px;margin-top:8px"><canvas id="chart-compo" width="320" height="120"></canvas></div>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="grid">
+      <div>
+        <div class="cards">
+          <div class="card">
+            <h3>Total Aset</h3>
+            <p id="total-assets">0</p>
+          </div>
+          <div class="card">
+            <h3>Total Liabilitas</h3>
+            <p id="total-liabilities">0</p>
+          </div>
+          <div class="card">
+            <h3>Laba / Rugi</h3>
+            <p id="net-income">0</p>
+          </div>
+        </div>
+
+        <div style="margin-top:16px">
+          <h2 style="margin:0 0 8px 0">Jurnal Terbaru</h2>
+          <table id="journal-table">
+            <thead>
+              <tr><th>Tanggal</th><th>Deskripsi</th><th>Debit</th><th>Kredit</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <aside class="right-panel">
+        <div class="small">
+          <h4 style="margin:0 0 8px 0">Produk Terlaris</h4>
+          <div style="font-weight:700">Es Kopi Susu — 234 terjual</div>
+          <div style="color:#64748b;font-size:13px;margin-top:6px">Rp 18.4jt</div>
+        </div>
+
+        <div class="small">
+          <h4 style="margin:0 0 8px 0">Status Periode</h4>
+          <div>Bulan: <strong>September 2026</strong></div>
+          <div style="margin-top:8px;color:#64748b;font-size:13px">Periode: Open</div>
+        </div>
+
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer">Tema: Biru • Putih • Hitam — Dibangun dengan HTML + Firebase</footer>
+</body>
+</html>
