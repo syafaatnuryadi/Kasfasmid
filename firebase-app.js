@@ -1,13 +1,18 @@
 (function () {
   const config = window.FIREBASE_CONFIG || {};
   const hasFirebaseSdk = typeof window.firebase !== 'undefined';
+  const hasValidConfig = !!config.apiKey && !!config.projectId && !!config.appId && !!config.authDomain;
 
-  if (hasFirebaseSdk && !firebase.apps.length) {
+  if (!hasValidConfig) {
+    console.warn('[Firebase] Config tidak valid atau belum diisi. Pastikan firebase-config.js berisi config asli dari Firebase Console.');
+  }
+
+  if (hasFirebaseSdk && hasValidConfig && !firebase.apps.length) {
     firebase.initializeApp(config);
   }
 
-  const auth = hasFirebaseSdk ? firebase.auth() : null;
-  const db = hasFirebaseSdk ? firebase.firestore() : null;
+  const auth = hasFirebaseSdk && hasValidConfig ? firebase.auth() : null;
+  const db = hasFirebaseSdk && hasValidConfig ? firebase.firestore() : null;
 
   const normalizeNumber = (value) => {
     const n = Number(value || 0);
@@ -26,17 +31,25 @@
     auth,
     db,
     isReady: !!auth && !!db,
+    hasValidConfig,
+    config,
 
     getBaseUrl() {
       return getCurrentBase();
     },
 
     async register(email, password) {
+      if (!this.hasValidConfig) {
+        throw new Error('Firebase config tidak valid. Salin konfigurasi asli dari Firebase Console ke firebase-config.js.');
+      }
       if (!this.isReady) throw new Error('Firebase belum siap. Pastikan konfigurasi Firebase dimuat dengan benar.');
       return auth.createUserWithEmailAndPassword(email, password);
     },
 
     async login(email, password) {
+      if (!this.hasValidConfig) {
+        throw new Error('Firebase config tidak valid. Salin konfigurasi asli dari Firebase Console ke firebase-config.js.');
+      }
       if (!this.isReady) throw new Error('Firebase belum siap. Pastikan konfigurasi Firebase dimuat dengan benar.');
       return auth.signInWithEmailAndPassword(email, password);
     },
