@@ -7,91 +7,46 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #0b66ff;
-      --primary-dark: #07122b;
-      --primary-soft: #eaf3ff;
-      --text: #0f172a;
-      --text-soft: #64748b;
+      --primary: #2563eb;
+      --primary-strong: #1d4ed8;
+      --primary-soft: #edf5ff;
+      --primary-deep: #0f172a;
       --bg: #f4f8ff;
+      --text: #0f172a;
+      --text-soft: #475569;
       --white: #ffffff;
-      --line: #e5edf9;
-      --success: #22c55e;
-      --danger: #ef4444;
-      --shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+      --line: rgba(148, 163, 184, 0.2);
+      --success: #16a34a;
+      --danger: #dc2626;
+      --shadow: 0 22px 60px rgba(37, 99, 235, 0.14);
+      --shadow-soft: 0 16px 34px rgba(15, 23, 42, 0.06);
     }
 
     * { box-sizing: border-box; font-family: Inter, Segoe UI, Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 35%, #ffffff 100%);
+      background:
+        radial-gradient(circle at top left, rgba(96, 165, 250, 0.16), transparent 25%),
+        linear-gradient(180deg, #f6f9ff 0%, #eef4ff 40%, #ffffff 100%);
       color: var(--text);
     }
 
-    .auth-shell {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      background: radial-gradient(circle at top left, #eaf3ff 0%, #f4f8ff 35%, #ffffff 100%);
-    }
-
-    .auth-card {
-      width: min(100%, 440px);
-      background: var(--white);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 28px;
-    }
-
-    .auth-card h2 {
-      margin: 0 0 8px;
-      font-size: 2rem;
-      letter-spacing: -0.04em;
-    }
-
-    .auth-card p {
-      margin: 0 0 20px;
-      color: var(--text-soft);
-    }
-
-    .auth-form {
-      display: grid;
-      gap: 16px;
-    }
-
-    .auth-form input {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px 14px;
-      background: #f8fbff;
-      font: inherit;
-    }
-
-    .auth-form button {
-      border: none;
-      border-radius: 12px;
-      padding: 12px 18px;
-      background: var(--primary);
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .auth-note {
-      margin-top: 14px;
-      font-size: 12px;
-      color: var(--text-soft);
-    }
-
     .nav {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 22px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      max-width: 1240px;
+      margin: 16px auto 0;
+      padding: 14px 22px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
     }
 
     .brand {
@@ -101,92 +56,126 @@
     }
 
     .logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #ffffff, #eaf3ff);
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid rgba(37, 99, 235, 0.12);
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--primary);
-      font-weight: 800;
-      box-shadow: 0 10px 24px rgba(11, 102, 255, 0.12);
+      font-weight: 900;
+      letter-spacing: -0.08em;
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.08);
     }
 
     .brand-name {
       font-weight: 800;
       font-size: 1.05rem;
+      letter-spacing: -0.03em;
     }
 
     .brand-sub {
-      font-size: 12px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       color: var(--text-soft);
     }
 
     .nav-links {
       display: flex;
-      gap: 18px;
       align-items: center;
+      gap: 18px;
     }
 
     .nav-links a, .nav-links button {
       color: var(--text);
       text-decoration: none;
-      font-weight: 600;
-      opacity: 0.8;
+      font-weight: 700;
+      font-size: 0.93rem;
       background: transparent;
       border: none;
       cursor: pointer;
-      font: inherit;
+      padding: 9px 12px;
+      border-radius: 10px;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
-    .nav-links a:hover, .nav-links button:hover { opacity: 1; }
+    .nav-links a:hover, .nav-links button:hover {
+      background: rgba(37, 99, 235, 0.06);
+      color: var(--primary);
+    }
 
     .container {
-      max-width: 1200px;
-      margin: 20px auto 40px;
+      max-width: 1240px;
+      margin: 28px auto 40px;
       padding: 0 16px;
     }
 
     .page-header {
-      background: linear-gradient(135deg, #091a32 0%, #0f2a52 30%, #0c6dff 100%);
-      border-radius: 24px;
-      color: white;
-      padding: 26px 28px;
+      background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 42%, #60a5fa 100%);
+      border-radius: 28px;
+      color: #fff;
+      padding: 30px 28px 26px;
       box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.08);
       margin-bottom: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header::after {
+      content: "";
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+      right: -80px;
+      top: -90px;
     }
 
     .page-header h1 {
       margin: 0;
-      font-size: clamp(2rem, 3vw, 2.5rem);
-      letter-spacing: -0.04em;
+      font-size: clamp(2rem, 3vw, 2.8rem);
+      letter-spacing: -0.06em;
+      line-height: 1.1;
+      position: relative;
+      z-index: 1;
     }
 
     .page-header p {
-      margin: 10px 0 0;
+      margin: 12px 0 0;
+      max-width: 760px;
       color: rgba(255,255,255,0.8);
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-columns: 1.2fr 0.8fr;
       gap: 22px;
       align-items: start;
     }
 
     .panel {
-      background: var(--white);
+      background: rgba(255,255,255,0.9);
       border: 1px solid var(--line);
-      border-radius: 20px;
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
       padding: 22px;
+      position: relative;
+      overflow: hidden;
     }
 
     .panel h2 {
       margin-top: 0;
       margin-bottom: 18px;
       font-size: 1.2rem;
+      letter-spacing: -0.03em;
     }
 
     form {
@@ -206,7 +195,7 @@
       gap: 8px;
       font-size: 0.92rem;
       color: var(--text);
-      font-weight: 600;
+      font-weight: 700;
     }
 
     input, select, button {
@@ -215,18 +204,19 @@
 
     input, select {
       width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 14px;
       background: #f8fbff;
-      padding: 12px 14px;
+      padding: 13px 14px;
       color: var(--text);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     }
 
     input:focus, select:focus {
       outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(11, 102, 255, 0.08);
+      border-color: rgba(37, 99, 235, 0.7);
+      background: var(--white);
+      box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.1);
     }
 
     .button-row, .toolbar, .filter-actions {
@@ -239,24 +229,25 @@
 
     .btn {
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 12px 18px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .btn:hover { transform: translateY(-1px); }
 
     .btn-primary {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 10px 24px rgba(11, 102, 255, 0.18);
+      background: linear-gradient(135deg, var(--primary) 0%, #60a5fa 100%);
+      color: var(--white);
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.2);
     }
 
     .btn-secondary {
       background: var(--primary-soft);
-      color: var(--primary-dark);
+      color: var(--primary-deep);
+      border: 1px solid rgba(37, 99, 235, 0.08);
     }
 
     .status {
@@ -265,21 +256,22 @@
       padding: 10px 12px;
       border-radius: 12px;
       font-size: 0.92rem;
-      font-weight: 600;
+      font-weight: 700;
+      line-height: 1.5;
     }
 
     .status.success {
       display: block;
-      background: rgba(34, 197, 94, 0.09);
+      background: rgba(34, 197, 94, 0.08);
       color: #166534;
-      border: 1px solid rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.18);
     }
 
     .status.error {
       display: block;
       background: rgba(239, 68, 68, 0.08);
       color: #b91c1c;
-      border: 1px solid rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.18);
     }
 
     .summary-box {
@@ -289,17 +281,18 @@
     }
 
     .summary-card {
-      background: #f8fbff;
+      background: linear-gradient(180deg, #ffffff, #f8fbff);
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 16px;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.02);
     }
 
     .summary-card h3 {
       margin: 0 0 8px;
       color: var(--text-soft);
-      font-size: 0.82rem;
-      letter-spacing: 0.04em;
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
@@ -320,8 +313,9 @@
     .table-wrap {
       overflow-x: auto;
       margin-top: 16px;
-      border-radius: 14px;
+      border-radius: 18px;
       border: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
     }
 
     table {
@@ -331,29 +325,64 @@
     }
 
     thead th {
-      background: linear-gradient(180deg, #0a1630, #0d1d3d);
-      color: #edf5ff;
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      color: rgba(255,255,255,0.92);
       text-align: left;
       padding: 12px 14px;
-      font-size: 12px;
-      letter-spacing: .04em;
+      font-size: 11px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
     tbody td {
       padding: 12px 14px;
       border-top: 1px solid var(--line);
-      vertical-align: top;
       color: var(--text);
+      vertical-align: top;
+      background: rgba(255,255,255,0.45);
     }
 
     tbody tr:hover {
-      background: #f8fbff;
+      background: rgba(37, 99, 235, 0.02);
     }
 
     .muted {
       color: var(--text-soft);
       font-size: 12px;
+    }
+
+    .action-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .table-action {
+      border: none;
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .table-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .table-action.edit {
+      background: rgba(37, 99, 235, 0.1);
+      color: #1d4ed8;
+    }
+
+    .table-action.delete {
+      background: rgba(239, 68, 68, 0.1);
+      color: #b91c1c;
     }
 
     .empty-state {
@@ -365,7 +394,7 @@
     @media (max-width: 900px) {
       .grid { grid-template-columns: 1fr; }
       .row, .filter-grid { grid-template-columns: 1fr; }
-      .nav { padding: 18px 16px; }
+      .nav { padding: 12px 16px; }
       .nav-links { display: none; }
     }
   </style>
@@ -381,7 +410,7 @@
         </div>
       </div>
       <div class="nav-links">
-        <a href="../">Halaman Pengunjung</a>
+        <a href="./">Halaman Pengunjung</a>
         <button id="logoutBtn" type="button">Logout</button>
       </div>
     </div>
@@ -448,8 +477,8 @@
             </div>
 
             <label>
-              Deskripsi
-              <input type="text" id="description" placeholder="Deskripsi transaksi" required>
+              Deskripsi (opsional)
+              <input type="text" id="description" placeholder="Deskripsi transaksi">
             </label>
 
             <div class="row">
@@ -475,13 +504,16 @@
                 </select>
               </label>
               <label>
-                Catatan
+                Catatan (opsional)
                 <input type="text" id="notes" placeholder="Catatan tambahan">
               </label>
             </div>
 
+            <input type="hidden" id="reportId" />
+
             <div class="button-row">
-              <button class="btn btn-primary" type="submit">Simpan Data</button>
+              <button class="btn btn-primary" id="submitReportBtn" type="submit">Simpan Data</button>
+              <button class="btn btn-secondary" id="cancelEditBtn" type="button" style="display:none;">Batal Edit</button>
             </div>
           </form>
 
@@ -514,6 +546,15 @@
       <section class="panel" style="margin-top:22px;">
         <h2>Filter Laporan</h2>
         <div class="filter-grid">
+          <label>
+            Perusahaan
+            <select id="companyFilter">
+              <option value="default">Default</option>
+              <option value="pt-abc">PT ABC</option>
+              <option value="cv-mitra">CV Mitra</option>
+              <option value="pt-xyz">PT XYZ</option>
+            </select>
+          </label>
           <label>
             Bulan
             <select id="monthFilter">
@@ -571,6 +612,7 @@
                 <th>Kredit</th>
                 <th>Metode</th>
                 <th>Catatan</th>
+                <th>Aksi</th>
               </tr>
             </thead>
             <tbody id="report-body"></tbody>
@@ -583,8 +625,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  <script src="../firebase-config.js"></script>
-  <script src="../firebase-app.js"></script>
+  <script src="./firebase-config.js"></script>
+  <script src="./firebase-app.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -598,6 +640,7 @@
       const totalDebitEl = document.getElementById('total-debit');
       const totalCreditEl = document.getElementById('total-credit');
       const netProfitEl = document.getElementById('net-profit');
+      const companyFilter = document.getElementById('companyFilter');
       const monthFilter = document.getElementById('monthFilter');
       const dateFrom = document.getElementById('dateFrom');
       const dateTo = document.getElementById('dateTo');
@@ -605,13 +648,21 @@
       const resetFilterBtn = document.getElementById('resetFilterBtn');
       const exportExcelBtn = document.getElementById('exportExcelBtn');
       const exportPdfBtn = document.getElementById('exportPdfBtn');
-      const basePath = '../';
+      const submitReportBtn = document.getElementById('submitReportBtn');
+      const cancelEditBtn = document.getElementById('cancelEditBtn');
+      const reportIdInput = document.getElementById('reportId');
+      const basePath = window.location.pathname.includes('/admin/') ? '../' : './';
+      const currentCompany = () => (companyFilter && companyFilter.value ? companyFilter.value : 'default');
+      let currentReports = [];
+      let editingReportId = null;
 
       const formatCurrency = (value) => new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         maximumFractionDigits: 0
       }).format(Number(value || 0));
+
+      const normalizeUppercaseText = (value) => String(value || '').trim().toUpperCase();
 
       function showStatus(message, type) {
         statusMessage.textContent = message;
@@ -627,12 +678,18 @@
             <td>${entry.description || '-'}</td>
             <td>${entry.category || '-'}</td>
             <td>${entry.accountType || '-'}</td>
-            <td>${entry.partner || '-'}</td>
+            <td>${normalizeUppercaseText(entry.partner) || '-'}</td>
             <td>${entry.documentType || '-'}</td>
             <td class="money">${formatCurrency(entry.debit || 0)}</td>
             <td class="money">${formatCurrency(entry.credit || 0)}</td>
             <td>${entry.paymentMethod || '-'}</td>
             <td>${entry.notes || '-'}</td>
+            <td>
+              <div class="action-cell">
+                <button type="button" class="table-action edit" data-action="edit" data-id="${entry.id || ''}">Edit</button>
+                <button type="button" class="table-action delete" data-action="delete" data-id="${entry.id || ''}">Hapus</button>
+              </div>
+            </td>
           </tr>
         `;
       }
@@ -668,6 +725,72 @@
         });
       }
 
+      function resetFormState() {
+        editingReportId = null;
+        reportIdInput.value = '';
+        form.reset();
+        submitReportBtn.textContent = 'Simpan Data';
+        cancelEditBtn.style.display = 'none';
+      }
+
+      function fillFormForEdit(entry) {
+        editingReportId = entry.id;
+        reportIdInput.value = entry.id || '';
+        document.getElementById('date').value = entry.date || '';
+        document.getElementById('journalNo').value = entry.journalNo || '';
+        document.getElementById('accountType').value = entry.accountType || 'asset';
+        document.getElementById('category').value = entry.category || 'Operasional';
+        document.getElementById('partner').value = normalizeUppercaseText(entry.partner || '');
+        document.getElementById('documentType').value = entry.documentType || 'Invoice';
+        document.getElementById('description').value = entry.description || '';
+        document.getElementById('debit').value = entry.debit || 0;
+        document.getElementById('credit').value = entry.credit || 0;
+        document.getElementById('paymentMethod').value = entry.paymentMethod || 'Tunai';
+        document.getElementById('notes').value = entry.notes || '';
+        submitReportBtn.textContent = 'Update Data';
+        cancelEditBtn.style.display = 'inline-flex';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showStatus('Mode edit aktif. Silakan ubah data lalu klik Update Data.', 'success');
+      }
+
+      tableBody.addEventListener('click', async (event) => {
+        const actionBtn = event.target.closest('[data-action]');
+        if (!actionBtn) return;
+
+        const reportId = actionBtn.dataset.id;
+        if (!reportId) return;
+
+        const selected = currentReports.find((item) => item.id === reportId);
+        if (!selected) return;
+
+        if (actionBtn.dataset.action === 'edit') {
+          fillFormForEdit(selected);
+          return;
+        }
+
+        if (actionBtn.dataset.action === 'delete') {
+          const confirmed = window.confirm('Apakah Anda yakin ingin menghapus data ini?');
+          if (!confirmed) return;
+
+          try {
+            const firebaseApi = window.LaporanKeuFirebase;
+            if (!firebaseApi || !firebaseApi.isReady) {
+              showStatus('Firebase belum siap. Cek konfigurasi aplikasi.', 'error');
+              return;
+            }
+            await firebaseApi.deleteReport(reportId);
+            if (editingReportId === reportId) {
+              resetFormState();
+            }
+            showStatus('Data berhasil dihapus.', 'success');
+            await loadReports();
+          } catch (error) {
+            console.error('Gagal menghapus laporan:', error);
+            showStatus(error.message || 'Hapus data gagal.', 'error');
+          }
+        }
+      });
+
       async function loadReports() {
         const firebaseApi = window.LaporanKeuFirebase;
         if (!firebaseApi || !firebaseApi.isReady) {
@@ -676,7 +799,8 @@
         }
 
         try {
-          const rows = await firebaseApi.loadReports();
+          const rows = await firebaseApi.loadReports(currentCompany());
+          currentReports = rows;
           const filteredRows = applyFilter(rows);
           renderTable(filteredRows);
           updateSummary(filteredRows);
@@ -725,7 +849,7 @@
 
       exportExcelBtn.addEventListener('click', async () => {
         try {
-          const rows = await window.LaporanKeuFirebase.loadReports();
+          const rows = await window.LaporanKeuFirebase.loadReports(currentCompany());
           const ws = XLSX.utils.json_to_sheet(rows.map((item) => ({
             Tanggal: item.date || '',
             'No. Jurnal': item.journalNo || '',
@@ -741,7 +865,7 @@
           })));
           const wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, ws, 'Laporan');
-          XLSX.writeFile(wb, 'laporan-keuangan.xlsx');
+          XLSX.writeFile(`${currentCompany()}-laporan-keuangan.xlsx`);
         } catch (error) {
           showStatus('Export Excel gagal.', 'error');
         }
@@ -749,7 +873,7 @@
 
       exportPdfBtn.addEventListener('click', async () => {
         try {
-          const rows = await window.LaporanKeuFirebase.loadReports();
+          const rows = await window.LaporanKeuFirebase.loadReports(currentCompany());
           const { jsPDF } = window.jspdf;
           const doc = new jsPDF();
           const tableData = rows.map((item) => [
@@ -763,7 +887,7 @@
             head: [['Tanggal', 'No. Jurnal', 'Deskripsi', 'Debit', 'Kredit']],
             body: tableData
           });
-          doc.save('laporan-keuangan.pdf');
+          doc.save(`${currentCompany()}-laporan-keuangan.pdf`);
         } catch (error) {
           showStatus('Export PDF gagal.', 'error');
         }
@@ -778,11 +902,12 @@
         }
 
         const payload = {
+          companyId: currentCompany(),
           date: document.getElementById('date').value,
           journalNo: document.getElementById('journalNo').value.trim(),
           accountType: document.getElementById('accountType').value,
           category: document.getElementById('category').value,
-          partner: document.getElementById('partner').value.trim(),
+          partner: normalizeUppercaseText(document.getElementById('partner').value),
           documentType: document.getElementById('documentType').value,
           description: document.getElementById('description').value.trim(),
           debit: document.getElementById('debit').value,
@@ -791,19 +916,29 @@
           notes: document.getElementById('notes').value.trim()
         };
 
-        if (!payload.date || !payload.journalNo || !payload.description) {
-          showStatus('Tanggal, nomor jurnal, dan deskripsi wajib diisi.', 'error');
+        if (!payload.date || !payload.journalNo) {
+          showStatus('Tanggal dan nomor jurnal wajib diisi.', 'error');
           return;
         }
 
         try {
-          await firebaseApi.saveReport(payload);
-          form.reset();
-          showStatus('Data laporan berhasil disimpan ke Firebase.', 'success');
-          loadReports();
+          if (editingReportId) {
+            await firebaseApi.updateReport(editingReportId, payload, currentCompany());
+            showStatus('Data laporan berhasil diperbarui.', 'success');
+          } else {
+            await firebaseApi.saveReport(payload);
+            showStatus('Data laporan berhasil disimpan ke Firebase.', 'success');
+          }
+          resetFormState();
+          await loadReports();
         } catch (error) {
           showStatus(error.message || 'Data gagal disimpan.', 'error');
         }
+      });
+
+      cancelEditBtn.addEventListener('click', () => {
+        resetFormState();
+        showStatus('Mode edit dibatalkan.', 'success');
       });
     });
   </script>
